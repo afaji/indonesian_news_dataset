@@ -7,8 +7,8 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 def url_date_generator():
-    start_date = date(2016, 1, 2)
-    end_date = date(2016, 1, 3)
+    start_date = date(2010, 1, 2)
+    end_date = date(2017, 2, 3)
     date_url = [("http://bisniskeuangan.kompas.com/search/bisniskeuangan/" + single_date.strftime("%Y-%m-%d")) for single_date in daterange(start_date, end_date)]
     
     return date_url
@@ -17,9 +17,9 @@ def url_date_generator():
 class QuotesSpider(scrapy.Spider):
     name = "kompas"
     start_urls = url_date_generator()
-    f_title = open('url.csv', 'w')
+    f_url = open('url.csv', 'w')
     f_content = open('content.txt','w')
-
+    f_title = open('title.csv','w')
     def parse(self, response):
         content_urls = []
         content_titles = []
@@ -28,10 +28,10 @@ class QuotesSpider(scrapy.Spider):
             content_titles.append(  news.xpath('a/text()').extract_first()  )
 
         for url, title in zip(content_urls, content_titles):
-            self.f_title.write('%s;%s\n'% (url, title) )
-        
-        for url in content_urls:
-            yield scrapy.Request(url, callback=self.parse_content)
+            self.f_title.write('%s\n'% title )
+            self.f_url.write('%s\n'%url)
+        #for url in content_urls:
+        #    yield scrapy.Request(url, callback=self.parse_content)
 
             
     def parse_content(self, response):
